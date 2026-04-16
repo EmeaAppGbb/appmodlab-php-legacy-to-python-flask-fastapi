@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Events{% endblock %}
+{% block content %}
+<h1>Events</h1>
+
+<form method="get" action="/events" class="filter-form">
+    <label for="category">Filter by Category:</label>
+    <select name="category" id="category" onchange="this.form.submit()">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+        <option value="{{ cat.id }}" {% if selected_category == cat.id %}selected{% endif %}>
+            {{ cat.icon or '' }} {{ cat.name }}
+        </option>
+        {% endfor %}
+    </select>
+</form>
+
+{% if events %}
+<div class="event-grid">
+    {% for event in events %}
+    <div class="event-card">
+        {% if event.image_path %}
+        <img src="/static/uploads/{{ event.image_path }}" alt="{{ event.title }}">
+        {% endif %}
+        <h3><a href="/events/{{ event.id }}">{{ event.title }}</a></h3>
+        <p class="event-date">{{ event.event_date.strftime('%B %d, %Y') }}</p>
+        <p class="event-time">{{ event.start_time.strftime('%I:%M %p') }} – {{ event.end_time.strftime('%I:%M %p') }}</p>
+        {% if event.venue %}
+        <p class="event-venue">{{ event.venue.name }}, {{ event.venue.city }}</p>
+        {% endif %}
+        {% if event.category_rel %}
+        <span class="badge">{{ event.category_rel.name }}</span>
+        {% endif %}
+        <p class="event-price">${{ "%.2f"|format(event.price) }}</p>
+        <a href="/events/{{ event.id }}" class="btn">View Details</a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No events found.</p>
+{% endif %}
+{% endblock %}

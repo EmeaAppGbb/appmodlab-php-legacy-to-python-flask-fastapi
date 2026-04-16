@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<h1>Login</h1>
+<form id="login-form" class="auth-form">
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required>
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+    </div>
+    <button type="submit" class="btn">Login</button>
+    <p id="login-error" class="error" style="display:none;"></p>
+</form>
+<p>Don't have an account? <a href="/register">Register here</a></p>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errEl = document.getElementById('login-error');
+    errEl.style.display = 'none';
+    const resp = await fetch('/api/v1/auth/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value
+        })
+    });
+    if (resp.ok) {
+        const data = await resp.json();
+        localStorage.setItem('access_token', data.access_token);
+        window.location.href = '/';
+    } else {
+        const err = await resp.json();
+        errEl.textContent = err.detail || 'Login failed';
+        errEl.style.display = 'block';
+    }
+});
+</script>
+{% endblock %}

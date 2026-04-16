@@ -1,6 +1,51 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block content %}
-<h1>Welcome to CityPulse Events</h1>
-<p>Discover and attend amazing events in your city.</p>
+<section class="hero">
+    <h1>Welcome to CityPulse Events</h1>
+    <p>Discover and attend amazing events in your city.</p>
+    <form action="/events" method="get" class="search-form">
+        <input type="text" name="q" placeholder="Search events...">
+        <button type="submit">Search</button>
+    </form>
+</section>
+
+{% if categories %}
+<section class="categories">
+    <h2>Browse by Category</h2>
+    <div class="category-grid">
+        {% for cat in categories %}
+        <a href="/events?category={{ cat.id }}" class="category-card">
+            <span class="icon">{{ cat.icon or '' }}</span>
+            <span>{{ cat.name }}</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if events %}
+<section class="upcoming-events">
+    <h2>Upcoming Events</h2>
+    <div class="event-grid">
+        {% for event in events %}
+        <div class="event-card">
+            <h3><a href="/events/{{ event.id }}">{{ event.title }}</a></h3>
+            <p class="event-date">{{ event.event_date.strftime('%B %d, %Y') }}</p>
+            <p class="event-time">{{ event.start_time.strftime('%I:%M %p') }} – {{ event.end_time.strftime('%I:%M %p') }}</p>
+            {% if event.venue %}
+            <p class="event-venue">{{ event.venue.name }}, {{ event.venue.city }}</p>
+            {% endif %}
+            {% if event.category_rel %}
+            <span class="badge">{{ event.category_rel.name }}</span>
+            {% endif %}
+            <p class="event-price">${{ "%.2f"|format(event.price) }}</p>
+            <a href="/events/{{ event.id }}" class="btn">View Details</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% else %}
+<p>No upcoming events at this time.</p>
+{% endif %}
 {% endblock %}

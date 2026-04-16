@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }}{% endblock %}
+{% block content %}
+<article class="event-detail">
+    {% if event.image_path %}
+    <img src="/static/uploads/{{ event.image_path }}" alt="{{ event.title }}" class="event-image">
+    {% endif %}
+
+    <h1>{{ event.title }}</h1>
+
+    {% if event.category_rel %}
+    <span class="badge">{{ event.category_rel.name }}</span>
+    {% endif %}
+
+    <div class="event-meta">
+        <p><strong>Date:</strong> {{ event.event_date.strftime('%B %d, %Y') }}</p>
+        <p><strong>Time:</strong> {{ event.start_time.strftime('%I:%M %p') }} – {{ event.end_time.strftime('%I:%M %p') }}</p>
+        {% if event.venue %}
+        <p><strong>Venue:</strong> {{ event.venue.name }}</p>
+        <p><strong>Address:</strong> {{ event.venue.address }}, {{ event.venue.city }}</p>
+        {% endif %}
+        {% if event.organizer %}
+        <p><strong>Organizer:</strong> {{ event.organizer.company_name }}</p>
+        {% endif %}
+        <p><strong>Price:</strong> ${{ "%.2f"|format(event.price) }}</p>
+        <p><strong>Capacity:</strong> {{ event.max_capacity }}</p>
+        <p><strong>Status:</strong> {{ event.status.value }}</p>
+    </div>
+
+    <div class="event-description">
+        <h2>About This Event</h2>
+        <p>{{ event.description }}</p>
+    </div>
+
+    {% if event.reviews %}
+    <section class="reviews">
+        <h2>Reviews ({{ event.reviews|length }})</h2>
+        {% for review in event.reviews %}
+        <div class="review-card">
+            <div class="review-rating">
+                {% for i in range(review.rating) %}★{% endfor %}{% for i in range(5 - review.rating) %}☆{% endfor %}
+            </div>
+            {% if review.comment %}
+            <p>{{ review.comment }}</p>
+            {% endif %}
+            <small>{{ review.created_at.strftime('%B %d, %Y') }}</small>
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+</article>
+{% endblock %}
