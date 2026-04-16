@@ -1,37 +1,25 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}{{ page_title | default('Search Results', true) }}{% endblock %}
 {% block content %}
-<div class="hero">
-    <h2>Discover Amazing Events in Your City</h2>
-    <p>Find concerts, festivals, workshops, and more on CityPulse Events</p>
+<div class="page-header">
+    <h2>{{ page_title | default('Search Results', true) }}</h2>
+</div>
 
-    <form action="/events/search" method="GET" class="search-form">
-        <input type="text" name="q" placeholder="Search events..." required>
+<div class="search-form">
+    <form method="GET" action="/events/search">
+        <input type="text" name="q" value="{{ search_term | default('', true) | e }}" placeholder="Search events..." required>
         <button type="submit">Search</button>
     </form>
 </div>
 
-<section class="categories">
-    <h3>Browse by Category</h3>
-    <div class="category-grid">
-        {% for category in categories %}
-            <a href="/events?category={{ category.id }}" class="category-card">
-                <span class="icon">{{ category.icon | default('', true) }}</span>
-                <span class="name">{{ category.name }}</span>
-            </a>
-        {% endfor %}
-    </div>
-</section>
+{% if search_term and events | length > 0 %}
+    <p class="search-count">Found {{ events | length }} events</p>
 
-<section class="upcoming-events">
-    <h3>Upcoming Events</h3>
     <div class="event-grid">
         {% for event in events %}
             <div class="event-card">
                 {% if event.image_path %}
                     <img src="/static/uploads/{{ event.image_path }}" alt="{{ event.title | e }}">
-                {% else %}
-                    <img src="{{ url_for('static', filename='css/placeholder.jpg') }}" alt="{{ event.title | e }}">
                 {% endif %}
                 <div class="event-info">
                     <h4><a href="/events/{{ event.id }}">{{ event.title }}</a></h4>
@@ -43,5 +31,7 @@
             </div>
         {% endfor %}
     </div>
-</section>
+{% elif search_term %}
+    <p class="no-results">No events found matching your search.</p>
+{% endif %}
 {% endblock %}

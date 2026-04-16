@@ -1,52 +1,81 @@
 {% extends "base.html" %}
 {% block title %}{{ event.title }}{% endblock %}
 {% block content %}
-<article class="event-detail">
-    {% if event.image_path %}
-    <img src="/static/uploads/{{ event.image_path }}" alt="{{ event.title }}" class="event-image">
-    {% endif %}
-
-    <h1>{{ event.title }}</h1>
-
-    {% if event.category_rel %}
-    <span class="badge">{{ event.category_rel.name }}</span>
-    {% endif %}
-
-    <div class="event-meta">
-        <p><strong>Date:</strong> {{ event.event_date.strftime('%B %d, %Y') }}</p>
-        <p><strong>Time:</strong> {{ event.start_time.strftime('%I:%M %p') }} – {{ event.end_time.strftime('%I:%M %p') }}</p>
-        {% if event.venue %}
-        <p><strong>Venue:</strong> {{ event.venue.name }}</p>
-        <p><strong>Address:</strong> {{ event.venue.address }}, {{ event.venue.city }}</p>
+<div class="event-detail">
+    <div class="event-header">
+        {% if event.image_path %}
+            <img src="/static/uploads/{{ event.image_path }}" alt="{{ event.title | e }}" class="event-image">
         {% endif %}
-        {% if event.organizer %}
-        <p><strong>Organizer:</strong> {{ event.organizer.company_name }}</p>
-        {% endif %}
-        <p><strong>Price:</strong> ${{ "%.2f"|format(event.price) }}</p>
-        <p><strong>Capacity:</strong> {{ event.max_capacity }}</p>
-        <p><strong>Status:</strong> {{ event.status.value }}</p>
+
+        <div class="event-main-info">
+            <h2>{{ event.title }}</h2>
+            <p class="category">{{ event.category_name | default(event.category_rel.name if event.category_rel else '', true) }}</p>
+
+            {% if avg_rating is defined and avg_rating and avg_rating > 0 %}
+                <p class="rating">★ {{ avg_rating }} ({{ reviews | length }} reviews)</p>
+            {% endif %}
+
+            <div class="event-meta">
+                <p><strong>Date:</strong> {{ event.event_date.strftime('%B %d, %Y') if event.event_date else '' }}</p>
+                <p><strong>Time:</strong> {{ event.start_time.strftime('%I:%M %p') if event.start_time else '' }} - {{ event.end_time.strftime('%I:%M %p') if event.end_time else '' }}</p>
+                <p><strong>Venue:</strong> {{ event.venue_name | default(event.venue.name if event.venue else '', true) }}</p>
+                <p><strong>Address:</strong> {{ event.address | default(event.venue.address if event.venue else '', true) }}, {{ event.city | default(event.venue.city if event.venue else '', true) }}</p>
+                {% if event.organizer %}
+                    <p><strong>Organizer:</strong> {{ event.organizer_name | default(event.organizer.company_name, true) }}</p>
+                {% endif %}
+                <p><strong>Price:</strong> ${{ "%.2f" | format(event.price) }}</p>
+                <p><strong>Tickets Available:</strong> {{ tickets_available | default('N/A') }} / {{ event.max_capacity }}</p>
+            </div>
+
+            {% if tickets_available is defined and tickets_available > 0 %}
+                <a href="/tickets/purchase?event_id={{ event.id }}" class="btn btn-large">Buy Tickets</a>
+            {% else %}
+                <span class="sold-out">SOLD OUT</span>
+            {% endif %}
+        </div>
     </div>
 
     <div class="event-description">
-        <h2>About This Event</h2>
-        <p>{{ event.description }}</p>
+        <h3>About This Event</h3>
+        <p>{{ event.description | default('', true) | replace('\n', '<br>') | safe }}</p>
     </div>
 
-    {% if event.reviews %}
-    <section class="reviews">
-        <h2>Reviews ({{ event.reviews|length }})</h2>
-        {% for review in event.reviews %}
-        <div class="review-card">
-            <div class="review-rating">
-                {% for i in range(review.rating) %}★{% endfor %}{% for i in range(5 - review.rating) %}☆{% endfor %}
-            </div>
-            {% if review.comment %}
-            <p>{{ review.comment }}</p>
-            {% endif %}
-            <small>{{ review.created_at.strftime('%B %d, %Y') }}</small>
+    <div class="event-reviews">
+        <h3>Reviews ({{ reviews | length if reviews is defined else 0 }})</h3>
+
+        {% if session.get('user_id') %}
+            <form method="POST" class="review-form">
+                <h4>Write a Review</h4>
+                <div class="form-group">
+                    <label>Rating:</label>
+                    <select name="rating" required>
+                        <option value="5">5 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="2">2 Stars</option>
+                        <option value="1">1 Star</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Comment:</label>
+                    <textarea name="comment" rows="4" required></textarea>
+                </div>
+                <button type="submit" name="submit_review" class="btn">Submit Review</button>
+            </form>
+        {% endif %}
+
+        <div class="reviews-list">
+            {% for review in reviews | default([]) %}
+                <div class="review">
+                    <div class="review-header">
+                        <strong>{{ review.user_name | default('Anonymous', true) }}</strong>
+                        <span class="rating">★ {{ review.rating }}</span>
+                        <span class="date">{{ review.created_at.strftime('%B %d, %Y %I:%M %p') if review.created_at else '' }}</span>
+                    </div>
+                    <p>{{ review.comment | default('', true) | replace('\n', '<br>') | safe }}</p>
+                </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </section>
-    {% endif %}
-</article>
+    </div>
+</div>
 {% endblock %}

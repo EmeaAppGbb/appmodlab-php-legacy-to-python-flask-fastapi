@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Edit Event{% endblock %}
+{% block content %}
+<div class="form-container">
+    <h2>Edit Event</h2>
+
+    <form method="POST" action="/events/{{ event.id }}/edit" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Event Title:</label>
+            <input type="text" name="title" value="{{ event.title | e }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Description:</label>
+            <textarea name="description" rows="5" required>{{ event.description | default('', true) | e }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Venue:</label>
+            <select name="venue_id" required>
+                {% for venue in venues %}
+                    <option value="{{ venue.id }}" {% if event.venue_id == venue.id %}selected{% endif %}>
+                        {{ venue.name }} - {{ venue.city }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Category:</label>
+            <select name="category" required>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if event.category == cat.id or event.category_id == cat.id %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Event Date:</label>
+            <input type="date" name="event_date" value="{{ event.event_date.strftime('%Y-%m-%d') if event.event_date else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Start Time:</label>
+            <input type="time" name="start_time" value="{{ event.start_time.strftime('%H:%M') if event.start_time else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>End Time:</label>
+            <input type="time" name="end_time" value="{{ event.end_time.strftime('%H:%M') if event.end_time else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Max Capacity:</label>
+            <input type="number" name="max_capacity" value="{{ event.max_capacity }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Ticket Price:</label>
+            <input type="number" step="0.01" name="price" value="{{ event.price }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Event Image:</label>
+            {% if event.image_path %}
+                <p>Current: <img src="/static/uploads/{{ event.image_path }}" width="100" alt="Current image"></p>
+            {% endif %}
+            <input type="file" name="image">
+        </div>
+
+        <button type="submit" class="btn">Update Event</button>
+        <a href="/events/{{ event.id }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

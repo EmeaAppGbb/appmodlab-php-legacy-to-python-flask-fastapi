@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}My Tickets{% endblock %}
+{% block content %}
+<div class="my-tickets">
+    <h2>My Tickets</h2>
+
+    {% if tickets and tickets | length > 0 %}
+        <div class="tickets-list">
+            {% for ticket in tickets %}
+                <div class="ticket-card">
+                    <div class="ticket-header">
+                        <h3>{{ ticket.event_title | default(ticket.event.title if ticket.event else '', true) }}</h3>
+                        <span class="status {{ ticket.payment_status | default('pending', true) }}">{{ (ticket.payment_status | default('pending', true)) | capitalize }}</span>
+                    </div>
+
+                    <div class="ticket-details">
+                        <p><strong>Date:</strong> {{ ticket.event_date.strftime('%B %d, %Y') if ticket.event_date else '' }} at {{ ticket.start_time.strftime('%I:%M %p') if ticket.start_time else '' }}</p>
+                        <p><strong>Venue:</strong> {{ ticket.venue_name | default('', true) }}</p>
+                        <p><strong>Address:</strong> {{ ticket.address | default('', true) }}</p>
+                        <p><strong>Ticket Type:</strong> {{ (ticket.ticket_type | default('general', true)) | capitalize }}</p>
+                        <p><strong>QR Code:</strong> {{ ticket.qr_code | default('', true) }}</p>
+                        <p><strong>Purchase Date:</strong> {{ ticket.purchase_date.strftime('%B %d, %Y %I:%M %p') if ticket.purchase_date else '' }}</p>
+                        <p><strong>Price:</strong> ${{ "%.2f" | format(ticket.price) }}</p>
+                    </div>
+
+                    <div class="ticket-actions">
+                        <a href="/events/{{ ticket.event_id }}" class="btn btn-small">View Event</a>
+                        <button onclick="printTicket({{ ticket.id }})" class="btn btn-small btn-secondary">Print Ticket</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-tickets">You haven't purchased any tickets yet.</p>
+        <a href="/events" class="btn">Browse Events</a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function printTicket(ticketId) {
+    alert('Printing ticket #' + ticketId);
+}
+</script>
+{% endblock %}

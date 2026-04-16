@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Admin - User Management{% endblock %}
+{% block content %}
+<div class="admin-panel">
+    <h2>User Management</h2>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Registered</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ (user.role | default('user', true)) | capitalize }}</td>
+                    <td>{{ user.created_at.strftime('%B %d, %Y %I:%M %p') if user.created_at else '' }}</td>
+                    <td>
+                        <a href="/admin/users?edit={{ user.id }}">Edit</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

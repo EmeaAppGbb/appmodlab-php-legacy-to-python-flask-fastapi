@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Create Event{% endblock %}
+{% block content %}
+<div class="form-container">
+    <h2>Create New Event</h2>
+
+    <form method="POST" action="/events/create" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Event Title:</label>
+            <input type="text" name="title" required>
+        </div>
+
+        <div class="form-group">
+            <label>Description:</label>
+            <textarea name="description" rows="5" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Venue:</label>
+            <select name="venue_id" required>
+                <option value="">Select Venue</option>
+                {% for venue in venues %}
+                    <option value="{{ venue.id }}">{{ venue.name }} - {{ venue.city }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Category:</label>
+            <select name="category" required>
+                <option value="">Select Category</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Event Date:</label>
+            <input type="date" name="event_date" required>
+        </div>
+
+        <div class="form-group">
+            <label>Start Time:</label>
+            <input type="time" name="start_time" required>
+        </div>
+
+        <div class="form-group">
+            <label>End Time:</label>
+            <input type="time" name="end_time" required>
+        </div>
+
+        <div class="form-group">
+            <label>Max Capacity:</label>
+            <input type="number" name="max_capacity" required>
+        </div>
+
+        <div class="form-group">
+            <label>Ticket Price:</label>
+            <input type="number" step="0.01" name="price" required>
+        </div>
+
+        <div class="form-group">
+            <label>Event Image:</label>
+            <input type="file" name="image">
+        </div>
+
+        <button type="submit" class="btn">Create Event</button>
+    </form>
+</div>
+{% endblock %}

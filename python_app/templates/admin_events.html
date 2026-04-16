@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Admin - Event Management{% endblock %}
+{% block content %}
+<div class="admin-panel">
+    <h2>Event Management</h2>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Organizer</th>
+                <th>Date</th>
+                <th>Venue</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+                <tr>
+                    <td>{{ event.id }}</td>
+                    <td>{{ event.title }}</td>
+                    <td>{{ event.organizer_name | default(event.organizer.company_name if event.organizer else '', true) }}</td>
+                    <td>{{ event.event_date.strftime('%B %d, %Y') if event.event_date else '' }}</td>
+                    <td>{{ event.venue_name | default(event.venue.name if event.venue else '', true) }}</td>
+                    <td>{{ event.category_name | default(event.category_rel.name if event.category_rel else '', true) }}</td>
+                    <td>{{ (event.status | default('active', true)) | capitalize }}</td>
+                    <td>
+                        <a href="/events/{{ event.id }}">View</a> |
+                        <a href="/events/{{ event.id }}/edit">Edit</a> |
+                        <a href="/admin/events?delete={{ event.id }}" onclick="return confirm('Cancel this event?')">Cancel</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

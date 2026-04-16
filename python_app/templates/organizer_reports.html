@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Sales Reports{% endblock %}
+{% block content %}
+<div class="reports">
+    <h2>Sales Reports</h2>
+
+    <form method="GET" action="/organizers/reports" class="date-filter">
+        <label>From:</label>
+        <input type="date" name="start_date" value="{{ start_date | default('', true) }}">
+
+        <label>To:</label>
+        <input type="date" name="end_date" value="{{ end_date | default('', true) }}">
+
+        <button type="submit" class="btn">Filter</button>
+    </form>
+
+    <div class="report-summary">
+        <div class="stat-card">
+            <h3>{{ total_tickets | default(0) }}</h3>
+            <p>Total Tickets Sold</p>
+        </div>
+        <div class="stat-card">
+            <h3>${{ "%.2f" | format(total_revenue | default(0)) }}</h3>
+            <p>Total Revenue</p>
+        </div>
+    </div>
+
+    {% if sales_data and sales_data | length > 0 %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Event Date</th>
+                    <th>Tickets Sold</th>
+                    <th>Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in sales_data %}
+                    <tr>
+                        <td>{{ row.title }}</td>
+                        <td>{{ row.event_date.strftime('%B %d, %Y') if row.event_date else row.event_date }}</td>
+                        <td>{{ row.tickets_sold }}</td>
+                        <td>${{ "%.2f" | format(row.revenue | default(0)) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="export-actions">
+            <button onclick="exportToCSV()" class="btn btn-secondary">Export to CSV</button>
+        </div>
+    {% else %}
+        <p>No sales data for this period.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function exportToCSV() {
+    alert('CSV export would happen here');
+}
+</script>
+{% endblock %}
