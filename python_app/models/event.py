@@ -4,7 +4,7 @@ import enum
 from datetime import date, datetime, time
 from decimal import Decimal
 
-from sqlalchemy import Date, DateTime, Enum, ForeignKey, Numeric, String, Text, Time
+from sqlalchemy import Date, DateTime, Enum, ForeignKey, Numeric, String, Text, Time, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from python_app.database import Base
@@ -41,7 +41,7 @@ class Event(Base):
     )
     image_path: Mapped[str | None] = mapped_column(String(255))
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default="CURRENT_TIMESTAMP"
+        DateTime, server_default=func.now()
     )
 
     # Relationships
