@@ -71,3 +71,34 @@ Registration form with Username, Email, Password, Full Name, and Phone fields. P
 ### Admin Login
 ![Admin Login](assets/screenshots/05-admin-login.png)
 Login page with demo credentials displayed: Admin (admin/admin123), Organizer (organizer1/pass123), User (user1/pass123). Session-cookie-based auth with no CSRF protection.
+
+---
+
+## CLI-Guided Migration Walkthrough
+
+The complete PHP-to-FastAPI migration was performed interactively using **GitHub Copilot CLI** (`gh copilot`) across 8 incremental steps, each captured as a git tag.
+
+| Step | Tag | CLI Command (abbreviated) | What the CLI Produced |
+|------|-----|--------------------------|----------------------|
+| **1. Explore PHP Codebase** | `step-01-explore-php` | `gh copilot` — "Analyze the legacy PHP codebase…" | Comprehensive analysis document covering file structure, routing conventions, DB schema, auth flow, and legacy vulnerabilities. |
+| **2. Analyze Migration** | `step-02-analyze-migration` | `gh copilot` — "Map PHP patterns to Python equivalents…" | Migration mapping document: PHP includes → FastAPI routers, mysqli → SQLAlchemy, MD5 → bcrypt, sessions → JWT, procedural → async. |
+| **3. Design FastAPI** | `step-03-design-fastapi` | `gh copilot` — "Scaffold the FastAPI project structure…" | 18 files generated — project layout with `main.py`, routers, models, schemas, templates, config, and test stubs. |
+| **4. Data Models** | `step-04-data-models` | `gh copilot` — "Create SQLAlchemy models and Pydantic schemas…" | 7 SQLAlchemy ORM models (User, Event, Ticket, Category, Organizer, Venue, Order) + 8 Pydantic schema files for request/response validation. |
+| **5. Migrate Routes** | `step-05-migrate-routes` | `gh copilot` — "Implement all route handlers…" | Full route implementation with JWT authentication, CRUD operations, role-based access control, file uploads, and search. |
+| **6. Migrate Templates** | `step-06-migrate-templates` | `gh copilot` — "Convert PHP templates to Jinja2…" | 16 Jinja2 HTML templates converted from PHP — homepage, event list/detail, registration, login, admin dashboard, and more. |
+| **7. Add Tests** | `step-07-add-tests` | `gh copilot` — "Generate pytest test suite…" | 41 pytest tests covering auth flows, event CRUD, ticket purchasing, admin operations, and model validation. |
+| **8. Build & Run** | `step-08-build-run` | `gh copilot` — "Install dependencies and verify…" | Dependencies installed, all 41 tests pass, FastAPI app boots successfully with interactive docs at `/docs`. |
+
+---
+
+## Key Modernization Improvements
+
+The migration addressed critical security vulnerabilities and architectural debt present in the legacy PHP application:
+
+| Legacy PHP | Modern FastAPI | Impact |
+|-----------|---------------|--------|
+| **MD5 password hashing** | **bcrypt** with salt rounds | Passwords resistant to rainbow-table and brute-force attacks |
+| **Raw SQL with string concatenation** (SQL injection) | **Parameterized queries** via SQLAlchemy ORM | Eliminates SQL injection vulnerabilities entirely |
+| **Session-cookie auth** with no CSRF protection | **JWT (JSON Web Tokens)** with expiry and role claims | Stateless, secure authentication suitable for APIs and SPAs |
+| **Procedural PHP** with `include`/`require` spaghetti | **Async FastAPI** with dependency injection and routers | Clean separation of concerns, auto-generated OpenAPI docs |
+| **mysqli** direct database calls | **SQLAlchemy ORM** with Alembic migrations | Type-safe queries, relationship mapping, schema versioning |
