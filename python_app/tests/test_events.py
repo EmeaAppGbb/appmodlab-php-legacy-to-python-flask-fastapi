@@ -2,8 +2,6 @@
 
 import pytest
 
-from tests.conftest import TEST_PASSWORD, auth_header
-
 
 class TestListEvents:
     async def test_list_events_empty(self, client):
@@ -59,7 +57,7 @@ class TestCreateEvent:
         "price": "15.00",
     }
 
-    async def test_create_event_as_organizer(self, client, organizer_token):
+    async def test_create_event_as_organizer(self, client, organizer_token, auth_header):
         resp = await client.post(
             "/api/v1/events/",
             json=self.EVENT_PAYLOAD,
@@ -71,7 +69,7 @@ class TestCreateEvent:
         assert data["max_capacity"] == 500
 
     async def test_create_event_unauthorized_regular_user(
-        self, client, user_token
+        self, client, user_token, auth_header
     ):
         resp = await client.post(
             "/api/v1/events/",
@@ -86,7 +84,7 @@ class TestCreateEvent:
 
 
 class TestUpdateEvent:
-    async def test_update_event(self, client, sample_event, organizer_token):
+    async def test_update_event(self, client, sample_event, organizer_token, auth_header):
         resp = await client.put(
             f"/api/v1/events/{sample_event.id}",
             json={"title": "Updated Concert"},
@@ -95,7 +93,7 @@ class TestUpdateEvent:
         assert resp.status_code == 200
         assert resp.json()["title"] == "Updated Concert"
 
-    async def test_update_event_not_found(self, client, organizer_token):
+    async def test_update_event_not_found(self, client, organizer_token, auth_header):
         resp = await client.put(
             "/api/v1/events/99999",
             json={"title": "Nope"},
@@ -106,7 +104,7 @@ class TestUpdateEvent:
 
 class TestDeleteEvent:
     async def test_delete_event_soft_cancel(
-        self, client, sample_event, organizer_token
+        self, client, sample_event, organizer_token, auth_header
     ):
         resp = await client.delete(
             f"/api/v1/events/{sample_event.id}",
@@ -115,7 +113,7 @@ class TestDeleteEvent:
         assert resp.status_code == 200
         assert resp.json()["status"] == "cancelled"
 
-    async def test_delete_event_not_found(self, client, organizer_token):
+    async def test_delete_event_not_found(self, client, organizer_token, auth_header):
         resp = await client.delete(
             "/api/v1/events/99999",
             headers=auth_header(organizer_token),

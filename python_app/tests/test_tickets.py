@@ -2,11 +2,9 @@
 
 import pytest
 
-from tests.conftest import auth_header
-
 
 class TestPurchaseTicket:
-    async def test_purchase_ticket(self, client, sample_event, user_token):
+    async def test_purchase_ticket(self, client, sample_event, user_token, auth_header):
         resp = await client.post(
             f"/api/v1/tickets/events/{sample_event.id}/purchase",
             json={"event_id": sample_event.id, "ticket_type": "general"},
@@ -27,7 +25,7 @@ class TestPurchaseTicket:
 
 
 class TestMyTickets:
-    async def test_get_my_tickets(self, client, sample_event, user_token):
+    async def test_get_my_tickets(self, client, sample_event, user_token, auth_header):
         # Purchase a ticket first
         await client.post(
             f"/api/v1/tickets/events/{sample_event.id}/purchase",
@@ -43,7 +41,7 @@ class TestMyTickets:
         assert len(data) >= 1
         assert data[0]["event_id"] == sample_event.id
 
-    async def test_get_my_tickets_empty(self, client, user_token):
+    async def test_get_my_tickets_empty(self, client, user_token, auth_header):
         resp = await client.get(
             "/api/v1/tickets/me", headers=auth_header(user_token)
         )
@@ -53,7 +51,7 @@ class TestMyTickets:
 
 class TestSoldOut:
     async def test_purchase_sold_out_event(
-        self, client, sold_out_event, organizer_token
+        self, client, sold_out_event, organizer_token, auth_header
     ):
         """Organizer tries to buy a ticket for a sold-out event (capacity 1, already sold)."""
         resp = await client.post(

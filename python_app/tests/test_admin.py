@@ -2,11 +2,9 @@
 
 import pytest
 
-from tests.conftest import auth_header
-
 
 class TestAdminListUsers:
-    async def test_list_users_as_admin(self, client, admin_token, regular_user):
+    async def test_list_users_as_admin(self, client, admin_token, regular_user, auth_header):
         resp = await client.get(
             "/api/v1/admin/users", headers=auth_header(admin_token)
         )
@@ -15,7 +13,7 @@ class TestAdminListUsers:
         assert isinstance(data, list)
         assert len(data) >= 1
 
-    async def test_list_users_as_non_admin(self, client, user_token):
+    async def test_list_users_as_non_admin(self, client, user_token, auth_header):
         resp = await client.get(
             "/api/v1/admin/users", headers=auth_header(user_token)
         )
@@ -28,7 +26,7 @@ class TestAdminListUsers:
 
 class TestAdminManageEvents:
     async def test_admin_list_all_events(
-        self, client, admin_token, sample_event
+        self, client, admin_token, sample_event, auth_header
     ):
         resp = await client.get(
             "/api/v1/admin/events", headers=auth_header(admin_token)
@@ -38,7 +36,7 @@ class TestAdminManageEvents:
         assert len(data) >= 1
 
     async def test_admin_update_event_status(
-        self, client, admin_token, sample_event
+        self, client, admin_token, sample_event, auth_header
     ):
         resp = await client.put(
             f"/api/v1/admin/events/{sample_event.id}/status",
@@ -48,7 +46,7 @@ class TestAdminManageEvents:
         assert resp.status_code == 200
         assert resp.json()["status"] == "cancelled"
 
-    async def test_admin_cancel_event(self, client, admin_token, sample_event):
+    async def test_admin_cancel_event(self, client, admin_token, sample_event, auth_header):
         resp = await client.delete(
             f"/api/v1/admin/events/{sample_event.id}",
             headers=auth_header(admin_token),
@@ -56,7 +54,7 @@ class TestAdminManageEvents:
         assert resp.status_code == 200
         assert resp.json()["status"] == "cancelled"
 
-    async def test_admin_events_as_regular_user(self, client, user_token):
+    async def test_admin_events_as_regular_user(self, client, user_token, auth_header):
         resp = await client.get(
             "/api/v1/admin/events", headers=auth_header(user_token)
         )

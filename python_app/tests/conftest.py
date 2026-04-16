@@ -25,9 +25,21 @@ from python_app.models import (
 TEST_PASSWORD = "testpass123"
 
 
-def auth_header(token: str) -> dict[str, str]:
+def _auth_header(token: str) -> dict[str, str]:
     """Build an Authorization header dict from a bearer token."""
     return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def auth_header():
+    """Fixture that returns a helper to build Authorization headers."""
+    return _auth_header
+
+
+@pytest.fixture
+def test_password():
+    """Fixture exposing the shared test password constant."""
+    return TEST_PASSWORD
 
 
 @pytest_asyncio.fixture

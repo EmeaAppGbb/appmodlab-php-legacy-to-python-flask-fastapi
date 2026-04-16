@@ -2,14 +2,12 @@
 
 import pytest
 
-from tests.conftest import TEST_PASSWORD, auth_header
-
 
 class TestLogin:
-    async def test_login_valid_credentials(self, client, regular_user):
+    async def test_login_valid_credentials(self, client, regular_user, test_password):
         resp = await client.post(
             "/api/v1/auth/login",
-            json={"username": regular_user.username, "password": TEST_PASSWORD},
+            json={"username": regular_user.username, "password": test_password},
         )
         assert resp.status_code == 200
         data = resp.json()
@@ -64,7 +62,7 @@ class TestRegister:
 
 
 class TestCurrentUser:
-    async def test_get_current_user(self, client, regular_user, user_token):
+    async def test_get_current_user(self, client, regular_user, user_token, auth_header):
         resp = await client.get(
             "/api/v1/auth/me", headers=auth_header(user_token)
         )
@@ -77,18 +75,18 @@ class TestCurrentUser:
         resp = await client.get("/api/v1/auth/me")
         assert resp.status_code == 401
 
-    async def test_get_current_user_invalid_token(self, client):
+    async def test_get_current_user_invalid_token(self, client, auth_header):
         resp = await client.get(
             "/api/v1/auth/me",
             headers=auth_header("invalid.jwt.token"),
         )
         assert resp.status_code == 401
 
-    async def test_jwt_token_from_login_works(self, client, regular_user):
+    async def test_jwt_token_from_login_works(self, client, regular_user, auth_header, test_password):
         """Login, grab the token, and use it to hit /me."""
         login_resp = await client.post(
             "/api/v1/auth/login",
-            json={"username": regular_user.username, "password": TEST_PASSWORD},
+            json={"username": regular_user.username, "password": test_password},
         )
         token = login_resp.json()["access_token"]
 
