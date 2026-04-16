@@ -1,9 +1,7 @@
-.git
-.gitignore
-.vscode
-.DS_Store
-Thumbs.db
-*.log
-node_modules/
-vendor/
-.env
+# Apache Configuration for CityPulse Events
+RewriteEngine On
+
+# Deny access to sensitive files
+<FilesMatch "\.(git|gitignore|env|log)$">
+    Require all denied
+</FilesMatch>

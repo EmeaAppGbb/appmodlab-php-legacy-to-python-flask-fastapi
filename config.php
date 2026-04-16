@@ -1,6 +1,6 @@
 <?php
 // Database Configuration - Hardcoded credentials (bad practice)
-define('DB_HOST', 'localhost');
+define('DB_HOST', getenv('DB_HOST') ?: 'db');
 define('DB_USER', 'citypulse_user');
 define('DB_PASS', 'citypulse123');
 define('DB_NAME', 'citypulse_events');
