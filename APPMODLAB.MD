@@ -11,7 +11,7 @@ modernizationTools: []
 agenticTools: []
 tags: ["php-migration", "fastapi", "mysql-to-postgresql", "api-first"]
 extensions: ["github.copilot"]
-thumbnail: ""
+thumbnail: "https://raw.githubusercontent.com/EmeaAppGbb/appmodlab-php-legacy-to-python-flask-fastapi/main/assets/thumbnail-gpt-image.png"
 video: ""
 version: "1.0.0"
 ---
